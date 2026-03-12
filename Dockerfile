@@ -9,4 +9,4 @@ COPY backend backend
 
 RUN mvn -f backend/pom.xml clean package -DskipTests
 
-CMD ["java","-jar","backend/target/*.jar"]
+CMD ["java","-jar","backend/target/ai-mock-interview-1.0.0.jar"]
