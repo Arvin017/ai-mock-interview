@@ -185,5 +185,16 @@ cd frontend && npm run build
 
 ---
 
+
+## Live Backend API
+
+Swagger UI:
+https://ai-mock-interview-g9dz.onrender.com/swagger-ui/index.html
+
+Base API:
+https://ai-mock-interview-g9dz.onrender.com
+
+Note: Backend is deployed on Render free tier. 
+The first request may take 30–60 seconds to wake the server.
 ## 📝 License
 MIT — Free to use for placement projects and portfolios.
