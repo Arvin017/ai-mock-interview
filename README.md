@@ -204,7 +204,7 @@ MIT — Free to use for placement projects and portfolios.
 ## 🚀 Live Demo
 
 **Frontend (Vercel):**
-https://ai-mock-interview-five-iota.vercel.app
+https://ai-mock-interview-five-iota.vercel.app/
 
 **Backend API (Render):**
 https://ai-mock-interview-g9dz.onrender.com
