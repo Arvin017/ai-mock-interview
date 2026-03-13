@@ -198,3 +198,20 @@ Note: Backend is deployed on Render free tier.
 The first request may take 30–60 seconds to wake the server.
 ## 📝 License
 MIT — Free to use for placement projects and portfolios.
+
+
+
+## 🚀 Live Demo
+
+**Frontend (Vercel):**
+https://ai-mock-interview-five-iota.vercel.app
+
+**Backend API (Render):**
+https://ai-mock-interview-g9dz.onrender.com
+
+**Swagger API Docs:**
+https://ai-mock-interview-g9dz.onrender.com/swagger-ui/index.html
+
+> ⚠️ Backend is deployed on Render free tier.
+> The first request may take **30–60 seconds** to wake the server.
+
