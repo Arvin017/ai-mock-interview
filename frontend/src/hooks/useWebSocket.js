@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
-const WS_URL = process.env.REACT_APP_WS_URL || 'http://localhost:8080/ws';
+const WS_URL = process.env.REACT_APP_WS_URL || 'https://ai-mock-interview-g9dz.onrender.com/ws';
 
 export function useWebSocket(sessionId, onFeedback) {
   const clientRef = useRef(null);

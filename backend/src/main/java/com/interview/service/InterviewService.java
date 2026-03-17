@@ -20,7 +20,7 @@ public class InterviewService {
     private static final Logger log = LoggerFactory.getLogger(InterviewService.class);
 
     @Autowired private AiService aiService;
-    @Autowired private      InterviewSessionRepository sessionRepo;
+    @Autowired private InterviewSessionRepository sessionRepo;
     @Autowired private QuestionAnswerRepository qaRepo;
 
     private final ObjectMapper mapper = new ObjectMapper();
@@ -133,11 +133,16 @@ public class InterviewService {
                                 List<String> improvements, List<String> positives) {}
 
     private FeedbackData evaluateAnswer(String answer, String questionHint, String domain) {
+        // Smart scoring: penalise empty/short/gibberish answers
+        boolean isEmpty   = answer == null || answer.trim().isEmpty() || answer.equals("(No answer provided)") || answer.equals("(Skipped)");
+        boolean isShort   = !isEmpty && answer.trim().length() < 30;
+        boolean isGarbage = !isEmpty && !isShort && isGibberish(answer);
+
         String systemPrompt = """
                 You are a strict but fair technical interviewer evaluating an answer.
                 Return ONLY valid JSON with these fields:
                 - "feedback": string (detailed constructive feedback, 2-3 sentences)
-                - "modelAnswer": string (what an ideal answer would cover, 2-4 sentences)  
+                - "modelAnswer": string (what an ideal answer would cover, 2-4 sentences)
                 - "score": integer 0-100
                 - "improvements": array of 2-3 string suggestions
                 - "positives": array of 1-2 string strengths in the answer
@@ -162,24 +167,48 @@ public class InterviewService {
             var node = mapper.readTree(json);
             List<String> improvements = mapper.convertValue(node.get("improvements"), new TypeReference<>() {});
             List<String> positives = mapper.convertValue(node.get("positives"), new TypeReference<>() {});
+
+            int score = node.path("score").asInt(50);
+            // Override score for clearly bad answers
+            if (isEmpty)   score = 5  + random.nextInt(10);
+            else if (isShort)   score = Math.min(score, 35);
+            else if (isGarbage) score = Math.min(score, 20);
+
             return new FeedbackData(
                     node.path("feedback").asText(),
                     node.path("modelAnswer").asText(),
-                    node.path("score").asInt(50),
+                    score,
                     improvements,
                     positives
             );
         } catch (Exception e) {
             log.error("Failed to parse feedback: {}", response, e);
+            int fallback = isEmpty ? 5 : isShort ? 25 : 50;
             return new FeedbackData(
                     "Your answer showed some understanding of the topic.",
                     "A strong answer would cover key concepts with specific examples.",
-                    55,
+                    fallback,
                     List.of("Add more specific examples", "Structure your answer clearly"),
                     List.of("Showed basic understanding")
             );
         }
     }
+
+    private boolean isGibberish(String text) {
+        if (text == null || text.length() < 5) return true;
+        // Check ratio of consonant clusters (gibberish tends to have high consonant density)
+        String lower = text.toLowerCase().replaceAll("[^a-z]", "");
+        if (lower.length() < 4) return true;
+        int vowels = 0;
+        for (char c : lower.toCharArray()) {
+            if ("aeiou".indexOf(c) >= 0) vowels++;
+        }
+        double vowelRatio = (double) vowels / lower.length();
+        // Real English has ~38% vowels; gibberish is usually <15%
+        return vowelRatio < 0.15;
+    }
+
+    private final java.util.Random random = new java.util.Random();
 
     // ── Complete Session & Build Dashboard ───────────────────────────
 
